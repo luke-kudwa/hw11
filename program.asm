@@ -40,7 +40,6 @@ loop_start:
 	;; increment edi so we can store second half of byte
 	call lowTranslation
 
-	;; 	mov edi, outputBuf
 	mov byte[edi], dl
 	inc edi
 
@@ -48,6 +47,7 @@ loop_start:
 	mov byte[edi], 0x20
 	inc edi
 
+	;;incrementing to next byte of data and decrementing counter of data byte left to process
 	inc esi
 	dec byte[counter]
 	
@@ -63,32 +63,32 @@ loop_start:
 	sub eax, outputBuf
 	
 
-
+	;;printing out everything in output buffer
 	mov ecx, outputBuf
 	mov ebx, 1
 	mov edx, eax
 	mov eax, 4
 	
 	int 80h
-
-
-	;; 	inc esi
-	;; 	mov al, [esi]		;loads second byte hopefully
-	;; 	movzx edx, al
-	
-
-	
+		
 	;;this is the end of the program
 	mov     ebx, 0      ; return 0 status on exit - 'No Errors'
 	mov     eax, 1  ; invoke SYS_EXIT (kernel opcode 1)
 	int     80h
 
+
+	;;subroutines
 highTranslation:
+	;;stores byte of data in edx
 	movzx edx, al
+	;;masks the byte
 	AND edx, 0xF0
+	;;shifts data for but the hex number on far right
 	SHR edx, 4
+	;;checks if it is a letter
 	cmp edx, 10
 	jl lessThan
+	;;since it is a letter, adds a little extra to convert it to the correct character
 	ADD edx, 0x07
 lessThan:
 	ADD edx, 0x30
@@ -97,10 +97,13 @@ lessThan:
 
 
 lowTranslation:
+	;;stores byte of data in edx
 	movzx edx, al
 	AND edx, 0x0F
+	;;checks if it is a letter
 	cmp edx, 10
 	jl less
+	;;since it is a letter, adds a little extra to convert it to the correct character
 	ADD edx, 0x07
 less:
 	ADD edx, 0x30
